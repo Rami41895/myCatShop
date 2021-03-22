@@ -1,40 +1,45 @@
-import {createStore, compose, applyMiddleware, combineReducers } from "redux";
+import { createStore, compose, applyMiddleware, combineReducers } from "redux";
 import thunk from "redux-thunk";
 import cartReduer from "./reducers";
-import throttle from 'lodash.throttle';
+import throttle from "lodash.throttle";
 
-function loadState(){
-    try{
-        const state = localStorage.getItem('cart');
+function loadState() {
+  try {
+    const state = localStorage.getItem("cart");
 
-        if(state !== null){
-            return JSON.parse(state);
-        }        
-    } catch(e){
-        // ignore errors
+    if (state !== null) {
+      return JSON.parse(state);
     }
+  } catch (e) {
+    // ignore errors
+  }
 
-    return {
-        cart: []
-    };
+  return {
+    cart: [],
+  };
 }
 
-function saveState(state){
-    console.log('saveState..')
-    localStorage.setItem('cart', JSON.stringify(state));
+function saveState(state) {
+  localStorage.setItem("cart", JSON.stringify(state));
 }
 
 const appReducers = combineReducers({
-    cart: cartReduer,
+  cart: cartReduer,
 });
 
-const store = createStore(appReducers, loadState(), compose(
+const store = createStore(
+  appReducers,
+  loadState(),
+  compose(
     applyMiddleware(thunk),
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
-));
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  )
+);
 
-store.subscribe(throttle(() => {
+store.subscribe(
+  throttle(() => {
     saveState(store.getState());
-}, 2000));
+  }, 2000)
+);
 
 export default store;
